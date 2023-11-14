@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") 
+}
+
+// User entity
+model User {
+  id             Int       @id @default(autoincrement())
+  email          String    
+  username       String?
+  profilePhoto   String?
+  password       String?
+  role           String    @default("user") 
+  emailVerified  Boolean   @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  reviews        Review[]
+  orders         Order[]
+  cart           Cart[]
+}
+
+// Product entity
+model Product {
+  id                     Int       @id @default(autoincrement())
+  name                  String?
+  description            String?
+  tax                    Boolean @default(false)
+  price                  Float
+  originalPrice          Float
+  discountedPrice         Float
+  costPerItem            Float
+  continueSellingWhenOutOfStock Boolean @default(false)
+  requiresShipping       Boolean @default(false)
+  weight                 Float
+  countryOfShipment      String?
+  hsCode                 String?
+  sku                    String?
+  barcode                String?
+  status                 Boolean  @default(false)  //Active?
+  productType            String?
+  vendor                 String?
+  collections            String[]
+  tags                   String[]
+  productImages          String[]
+  createdAt             DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+  reviews                Review[]
+  orders                  Order[]
+  carts                   Cart[]
+}
+
+// Order entity
+model Order {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  quantity    Int
+  totalPrice  Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Cart entity
+model Cart {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  user         User     @relation(fields: [userId], references: [id])
+  productId    Int
+  product      Product  @relation(fields: [productId], references: [id])
+  quantity     Int
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// Review entity
+model Review {
+  id           Int      @id @default(autoincrement())
+  product      Product  @relation(fields: [productId], references: [id])
+  productId    Int
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
+  stars        Int
+  comments     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
